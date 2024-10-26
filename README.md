@@ -1,4 +1,9 @@
-# RAD Embeddings
+![Rad Emeddings Logo](https://rad-embeddings.github.io/assets/logo.svg)
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://rad-embeddings.github.io/assets/splash.svg">
+  <img alt=Rad Emeddings overview" src="https://rad-embeddings.github.io/assets/splash_light.png">
+</picture>
 
 This repository contains the code for the paper: [**Compositional Automata Embeddings for Goal-Conditioned Reinforcement Learning**](https://rad-embeddings.github.io/), to appear in NeurIPS 2024.
 
