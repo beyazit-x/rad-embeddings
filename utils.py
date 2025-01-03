@@ -8,6 +8,8 @@ from torch_geometric.data import Data
 from torch_geometric.data import Batch
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 
+from dfa.utils import min_distance_to_accept_by_state
+
 feature_inds = {"temp": -5, "rejecting": -4, "accepting": -3, "init": -2, "normal": -1}
 
 class DFAFeaturesExtractor(BaseFeaturesExtractor):
@@ -21,7 +23,13 @@ class DFAFeaturesExtractor(BaseFeaturesExtractor):
         return self.encoder(feat)
 
 def dfa2feat(dfa_obs, n_tokens=10):
-    return Batch.from_data_list(list(map(lambda x: _dfa2feat(x, n_tokens=n_tokens), dfa_obs)))
+    dfa_obs = dfa_obs.squeeze()
+    if dfa_obs.ndim == 1:
+        return _dfa2feat(dfa_obs, n_tokens=n_tokens)
+    elif dfa_obs.ndim == 2:
+        return Batch.from_data_list(list(map(lambda x: _dfa2feat(x, n_tokens=n_tokens), dfa_obs)))
+    else:
+        raise ValueError(f"Invalid ndim for dfa_obs: expected 1 or 2, but got {dfa_obs.ndim}")
 
 def _dfa2feat(dfa_obs, n_tokens=10):
 
@@ -78,3 +86,20 @@ def _dfa2feat(dfa_obs, n_tokens=10):
     current_state = torch.from_numpy(np.array([1] + [0] * (len(nodes) - 1))) # 0 is the current state
 
     return Data(feat=feat, edge_index=edge_index.T, current_state=current_state)
+
+
+def dfa2dist(dfa_obs, n_tokens=10):
+    tokens = list(range(n_tokens))
+    feature_size = len(tokens) + len(feature_inds)
+
+    dfa_int = int("".join(map(str, map(int, dfa_obs.squeeze().tolist()))))
+    dfa = DFA.from_int(dfa_int, tokens)
+
+    n = len(dfa.states())
+
+    dist = min_distance_to_accept_by_state(dfa)[0]
+
+    if dist == float("inf"):
+        dist = 0
+
+    return dist
