@@ -36,5 +36,5 @@ model = PPO(
 
 print("Total number of parameters:", sum(p.numel() for p in model.policy.parameters() if p.requires_grad))
 print(model.policy)
-model.learn(100_000)
+model.learn(1_000_000)
 model.save("dfa_encoder/dfa_encoder")
