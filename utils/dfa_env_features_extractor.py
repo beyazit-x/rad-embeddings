@@ -1,7 +1,6 @@
 from model import Encoder
-from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
-
 from utils.utils import feature_inds, dfa2feat
+from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 
 class DFAEnvFeaturesExtractor(BaseFeaturesExtractor):
     def __init__(self, observation_space, features_dim, encoder_cls=Encoder, n_tokens=10):
@@ -12,4 +11,3 @@ class DFAEnvFeaturesExtractor(BaseFeaturesExtractor):
     def forward(self, dfa):
         feat = dfa2feat(dfa)
         return self.encoder(feat)
-

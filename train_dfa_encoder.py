@@ -1,10 +1,10 @@
-from dfa_gym import DFAEnv
+import dfa_gym
 from stable_baselines3 import PPO
 from utils import DFAEnvFeaturesExtractor
 from stable_baselines3.common.env_util import make_vec_env
 
 
-env = make_vec_env(DFAEnv, n_envs=16)
+env = make_vec_env("DFAEnv-v0", n_envs=16)
 
 
 policy_kwargs = dict(

@@ -1,5 +1,5 @@
 from dfa_gym import DFAEnv, DFAWrapper
-from envs.token_env import TokenEnv
+import token_env
 from stable_baselines3 import PPO
 from utils import TokenEnvFeaturesExtractor
 from stable_baselines3.common.env_util import make_vec_env
@@ -7,14 +7,14 @@ from stable_baselines3.common.env_checker import check_env
 from dfa_samplers import ReachAvoidSampler
 
 n_envs = 16
-env_kwargs = {"env_cls": TokenEnv, "label_f": TokenEnv.label_f}
+env_kwargs = {"env_id": "TokenEnv-v0", "label_f": token_env.TokenEnv.label_f}
 env = make_vec_env(DFAWrapper, env_kwargs=env_kwargs, n_envs=n_envs)
 
 
 policy_kwargs = dict(
     features_extractor_class=TokenEnvFeaturesExtractor,
     features_extractor_kwargs=dict(features_dim=1056),
-    net_arch=dict(pi=[64, 64, 64], vf=[64, 64]),
+    net_arch=dict(pi=[64, 64, 64, 64], vf=[64, 64, 64]),
     share_features_extractor=True,
 )
 

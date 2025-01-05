@@ -20,26 +20,18 @@ def dfa2feat(dfa_obs, n_tokens=10):
         raise ValueError(f"Invalid ndim for dfa_obs: expected 1 or 2, but got {dfa_obs.ndim}")
 
 def _dfa2feat(dfa_obs, n_tokens=10):
-
     tokens = list(range(n_tokens))
     feature_size = len(tokens) + len(feature_inds)
-
     dfa_int = int("".join(map(str, map(int, dfa_obs.squeeze().tolist()))))
     dfa = DFA.from_int(dfa_int, tokens)
-
     dfa_dict, s_init = dfa2dict(dfa)
-
     nodes = OrderedDict({s: np.zeros(feature_size) for s in dfa_dict.keys()})
     edges = [(s, s) for s in nodes]
-    
     for s in dfa_dict.keys():
-
         label, transitions = dfa_dict[s]
         leaving_transitions = [1 if s != transitions[a] else 0 for a in transitions.keys()]
-
         if s not in nodes:
             nodes[s] = np.zeros(feature_size)
-
         nodes[s][feature_inds["normal"]] = 1
         if s == s_init:
             nodes[s][feature_inds["init"]] = 1
@@ -47,7 +39,6 @@ def _dfa2feat(dfa_obs, n_tokens=10):
             nodes[s][feature_inds["accepting"]] = 1
         elif sum(leaving_transitions) == 0: # is rejecting?
             nodes[s][feature_inds["rejecting"]] = 1
-
         for e in dfa_dict.keys():
             if s == e:
                 continue
@@ -67,14 +58,10 @@ def _dfa2feat(dfa_obs, n_tokens=10):
                         edges.append((t_idx, t_idx))
                     if (t_idx, s_idx) not in edges:
                         edges.append((t_idx, s_idx))
-
     feat = torch.from_numpy(np.array(list(nodes.values())))
     edge_index = torch.from_numpy(np.array(edges))
-
     current_state = torch.from_numpy(np.array([1] + [0] * (len(nodes) - 1))) # 0 is the current state
-
     return Data(feat=feat, edge_index=edge_index.T, current_state=current_state)
-
 
 def dfa2dist(dfa_obs, n_tokens=10):
     tokens = list(range(n_tokens))

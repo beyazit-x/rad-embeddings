@@ -1,11 +1,8 @@
 import torch
 from torch import nn
-
 from model import Encoder
-
 from stable_baselines3 import PPO
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
-
 
 class TokenEnvFeaturesExtractor(BaseFeaturesExtractor):
     def __init__(self, observation_space, features_dim, encoder_cls=Encoder, n_tokens=10):
@@ -26,7 +23,6 @@ class TokenEnvFeaturesExtractor(BaseFeaturesExtractor):
             nn.Flatten()
         )
 
-
     def forward(self, dict_obs):
         dfa_obs = dict_obs["dfa_obs"]
         obs = dict_obs["obs"]
@@ -34,4 +30,3 @@ class TokenEnvFeaturesExtractor(BaseFeaturesExtractor):
         obs = self.image_conv(obs)
         obs = torch.cat((obs, rad), dim=1)
         return obs
-
