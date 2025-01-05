@@ -1,26 +1,14 @@
 import torch
 import numpy as np
 from dfa import DFA
-from model import Encoder
 from dfa.utils import dfa2dict
 from collections import OrderedDict
 from torch_geometric.data import Data
 from torch_geometric.data import Batch
-from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 
 from dfa.utils import min_distance_to_accept_by_state
 
 feature_inds = {"temp": -5, "rejecting": -4, "accepting": -3, "init": -2, "normal": -1}
-
-class DFAFeaturesExtractor(BaseFeaturesExtractor):
-    def __init__(self, observation_space, features_dim, encoder_cls=Encoder, n_tokens=10):
-        super().__init__(observation_space, features_dim)
-        in_feat_size = n_tokens + len(feature_inds)
-        self.encoder = encoder_cls(in_feat_size, features_dim)
-
-    def forward(self, dfa):
-        feat = dfa2feat(dfa)
-        return self.encoder(feat)
 
 def dfa2feat(dfa_obs, n_tokens=10):
     dfa_obs = dfa_obs.squeeze()

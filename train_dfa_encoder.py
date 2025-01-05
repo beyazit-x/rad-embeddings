@@ -1,20 +1,19 @@
 from dfa_gym import DFAEnv
 from stable_baselines3 import PPO
-from utils import DFAFeaturesExtractor
+from utils import DFAEnvFeaturesExtractor
 from stable_baselines3.common.env_util import make_vec_env
-from stable_baselines3.common.env_checker import check_env
 
-env = DFAEnv()
-check_env(env)
 
 env = make_vec_env(DFAEnv, n_envs=16)
 
+
 policy_kwargs = dict(
-    features_extractor_class=DFAFeaturesExtractor,
+    features_extractor_class=DFAEnvFeaturesExtractor,
     features_extractor_kwargs=dict(features_dim=32),
     net_arch=dict(pi=[], vf=[]),
     share_features_extractor=True,
 )
+
 
 model = PPO(
     policy="MlpPolicy",
@@ -30,10 +29,12 @@ model = PPO(
     vf_coef=0.5,
     max_grad_norm=0.5,
     policy_kwargs=policy_kwargs,
-    verbose=10
+    verbose=10,
+    tensorboard_log="dfa_encoder"
     )
+
 
 print("Total number of parameters:", sum(p.numel() for p in model.policy.parameters() if p.requires_grad))
 print(model.policy)
-model.learn(1_000_000)
-model.save("model")
+model.learn(100_000)
+model.save("dfa_encoder/dfa_encoder")
