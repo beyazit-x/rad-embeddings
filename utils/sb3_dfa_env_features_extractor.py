@@ -7,7 +7,8 @@ class DFAEnvFeaturesExtractor(BaseFeaturesExtractor):
         super().__init__(observation_space, features_dim)
         in_feat_size = n_tokens + len(feature_inds)
         self.encoder = encoder_cls(in_feat_size, features_dim)
+        self.n_tokens = n_tokens
 
     def forward(self, dfa):
-        feat = dfa2feat(dfa)
+        feat = dfa2feat(dfa, n_tokens=self.n_tokens)
         return self.encoder(feat)
