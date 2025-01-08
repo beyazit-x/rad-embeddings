@@ -9,8 +9,8 @@ from stable_baselines3.common.env_checker import check_env
 
 run = wandb.init(project="sb3", sync_tensorboard=True)
 
-env_id = "DFAEnv-v0"
 n_envs = 16
+env_id = "DFAEnv-v0"
 
 env = gym.make(env_id)
 check_env(env)
