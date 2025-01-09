@@ -23,6 +23,8 @@ n_tokens = env.unwrapped.n_tokens
 env_kwargs = dict(env_id = "TokenEnv-v0", sampler=ReachAvoidSampler(n_tokens=n_tokens, max_size=4, prob_stutter=1.0), label_f=token_env.TokenEnv.label_f)
 env = make_vec_env(DFAWrapper, env_kwargs=env_kwargs, n_envs=n_envs)
 
+import torch
+
 config = dict(
     policy = "MultiInputPolicy",
     env = env,
@@ -34,6 +36,7 @@ config = dict(
         features_extractor_kwargs=dict(features_dim=1056, n_tokens=n_tokens),
         net_arch=dict(pi=[64, 64, 64], vf=[64, 64]),
         share_features_extractor=True,
+        activation_fn=torch.nn.ReLU
     ),
     verbose = 10,
     tensorboard_log = f"token_env_reach_avoid_policy/runs/{run.id}"
