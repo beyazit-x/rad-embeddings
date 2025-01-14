@@ -2,13 +2,23 @@ import torch
 import numpy as np
 from dfa import DFA
 from dfa.utils import dfa2dict
+from stable_baselines3 import PPO
 from collections import OrderedDict
 from torch_geometric.data import Data
 from torch_geometric.data import Batch
-
 from dfa.utils import min_distance_to_accept_by_state
 
 feature_inds = {"temp": -5, "rejecting": -4, "accepting": -3, "init": -2, "normal": -1}
+
+def get_dfa_encoder():
+    file = "dfa_encoder/dfa_encoder"
+    model = PPO.load(file)
+    model.set_parameters(file)
+    dfa_encoder = model.policy
+    for param in dfa_encoder.parameters():
+        param.requires_grad = False
+    dfa_encoder.eval()
+    return dfa_encoder.features_extractor
 
 def dfa2feat(dfa_obs, n_tokens=10):
     dfa_obs = dfa_obs.squeeze()
@@ -26,7 +36,10 @@ def _dfa2feat(dfa_obs, n_tokens=10):
     dfa = DFA.from_int(dfa_int, tokens)
     dfa_dict, s_init = dfa2dict(dfa)
     nodes = OrderedDict({s: np.zeros(feature_size) for s in dfa_dict.keys()})
-    edges = [(s, s) for s in nodes]
+    if len(nodes) == 1:
+        edges = [(0, 0)]
+    else:
+        edges = [(s, s) for s in nodes]
     for s in dfa_dict.keys():
         label, transitions = dfa_dict[s]
         leaving_transitions = [1 if s != transitions[a] else 0 for a in transitions.keys()]
